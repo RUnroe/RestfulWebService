@@ -33,4 +33,23 @@ public class ImageService {
         return image;
     }
 
+    public boolean createImage(RestImage image) {
+        if (getImage(image.name) != null) return false;
+        //add to list
+        images.add(image);
+        return true;
+    }
+
+    public boolean deleteImage(String name) {
+        boolean removed = false;
+        for (RestImage image: images) {
+            if(Objects.equals(image.name, name)) {
+                images.remove(image);
+                removed = true;
+
+            }
+        }
+        return removed;
+    }
+
 }

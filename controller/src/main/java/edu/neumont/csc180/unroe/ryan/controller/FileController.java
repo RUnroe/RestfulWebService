@@ -1,27 +1,40 @@
 package edu.neumont.csc180.unroe.ryan.controller;
 
 import edu.neumont.csc180.unroe.ryan.ImageService;
+import edu.neumont.csc180.unroe.ryan.RestImage;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 @RestController
 public class FileController {
     ImageService imageService = new ImageService();
 
     @PostMapping("/image")
-    public ResponseEntity<Image> createImage() {
+    public ResponseEntity<Image> createImage(@RequestParam("file") MultipartFile imageFile) {
 
-        return ResponseEntity.ok().body(null);
+        //if image is name is found
+        try {
+            if(imageService.createImage(new RestImage(imageFile.getName(), ImageIO.read(imageFile.getInputStream() ))))
+                return new ResponseEntity<>(HttpStatus.CREATED); //201
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST); //400
     }
 
 
     @DeleteMapping("/image/{name}")
     public ResponseEntity<Image> deleteImage(@PathVariable(value = "name") String name) {
-        Image image = null;
-        return ResponseEntity.ok().body(image);
+
+        if(!imageService.deleteImage(name)) return new ResponseEntity<>(HttpStatus.NOT_FOUND); //404
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT); //204
     }
 
     @GetMapping("/image/{name}")
@@ -31,7 +44,6 @@ public class FileController {
         switch(transform) {
             case "grayscale":
                 image = imageService.getGrayscaleImage(name);
-
                 break;
             case "rotate_clockwise":
                 image = imageService.getRotatedImage(name);
@@ -39,6 +51,7 @@ public class FileController {
             default:
                 image = imageService.getImage(name);
         }
-        return ResponseEntity.ok().body(image);
+        if(image == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND); //404
+        return new ResponseEntity<>(image, HttpStatus.OK); //200
     }
 }
