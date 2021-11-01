@@ -21,16 +21,25 @@ import java.util.Objects;
 public class ImageService {
     String directory = "image/";
 
+    public BufferedImage getBufferedImage(String name) {
+        File image = new File(directory + name);
+        if(!image.exists()) return null;
+        try {
+            return ImageIO.read((image));
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
     public byte[] getImage(String name) {
 //        BufferedImage selectedImage = ImageIO.read(directory);
+
         File image = new File(directory + name);
-        System.out.println(image);
-        System.out.println(image.exists());
         if(!image.exists()) return null;
-        BufferedImage selectedImage = null;
+        BufferedImage selectedImage;
         ByteArrayOutputStream outputStream = null;
         try {
-            selectedImage = ImageIO.read((image));
+            selectedImage = getBufferedImage(name);
             outputStream = new ByteArrayOutputStream();
             ImageIO.write(selectedImage, "png", outputStream);
         } catch (IOException e) {
@@ -42,10 +51,28 @@ public class ImageService {
     }
 
     public byte[] getGrayscaleImage(String name) {
-        byte[] image = getImage(name);
-        //make grayscale
-
-        return null;
+        //https://www.tutorialspoint.com/java_dip/grayscale_conversion.htm
+        BufferedImage image = getBufferedImage(name);
+        if(image == null) return null;
+        int width = image.getWidth();
+        int height = image.getHeight();
+        for(int i=0; i<height; i++) {
+            for(int j=0; j<width; j++) {
+                Color c = new Color(image.getRGB(j, i));
+                int red = (int)(c.getRed() * 0.299);
+                int green = (int)(c.getGreen() * 0.587);
+                int blue = (int)(c.getBlue() *0.114);
+                Color newColor = new Color(red+green+blue,red+green+blue,red+green+blue);
+                image.setRGB(j,i,newColor.getRGB());
+            }
+        }
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try {
+            ImageIO.write(image, "png", outputStream);
+        } catch (IOException e) {
+            return null;
+        }
+        return outputStream.toByteArray();
     }
 
     public byte[] getRotatedImage(String name) {
