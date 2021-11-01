@@ -5,6 +5,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -15,28 +17,42 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+
 public class ImageService {
     String directory = "image/";
 
-    public BufferedImage getImage(String name) {
+    public byte[] getImage(String name) {
 //        BufferedImage selectedImage = ImageIO.read(directory);
+        File image = new File(directory + name);
+        System.out.println(image);
+        System.out.println(image.exists());
+        if(!image.exists()) return null;
         BufferedImage selectedImage = null;
+        ByteArrayOutputStream outputStream = null;
+        try {
+            selectedImage = ImageIO.read((image));
+            outputStream = new ByteArrayOutputStream();
+            ImageIO.write(selectedImage, "png", outputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
 
-        return selectedImage;
+        return outputStream.toByteArray();
     }
 
-    public BufferedImage getGrayscaleImage(String name) {
-        BufferedImage image = getImage(name);
+    public byte[] getGrayscaleImage(String name) {
+        byte[] image = getImage(name);
         //make grayscale
 
-        return image;
+        return null;
     }
 
-    public BufferedImage getRotatedImage(String name) {
-        BufferedImage image = getImage(name);
+    public byte[] getRotatedImage(String name) {
+        byte[] image = getImage(name);
         //rotate image
 
-        return image;
+        return null;
     }
 
     public boolean createImage(MultipartFile image) {

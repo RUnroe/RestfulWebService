@@ -3,6 +3,7 @@ package edu.neumont.csc180.unroe.ryan.controller;
 import edu.neumont.csc180.unroe.ryan.ImageService;
 import edu.neumont.csc180.unroe.ryan.RestImage;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,21 +41,28 @@ public class FileController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT); //204
     }
 
-    @GetMapping("/image/{name}")
-    public ResponseEntity<Image> getImageTransform(@PathVariable(value = "name") String name, @RequestParam String transform) {
+    @GetMapping(value = "/image/{name}", produces = MediaType.IMAGE_PNG_VALUE)
+    public ResponseEntity<byte[]> getImageTransform(@PathVariable(value = "name") String name, @RequestParam(required=false) String transform) {
         //Create three cases (empty, rotate, greyscale)
-        BufferedImage image;
-        switch(transform) {
-            case "grayscale":
-                image = imageService.getGrayscaleImage(name);
-                break;
-            case "rotate_clockwise":
-                image = imageService.getRotatedImage(name);
-                break;
-            default:
-                image = imageService.getImage(name);
+        byte[] image;
+        System.out.println(transform);
+        System.out.println(name);
+        if(transform != null) {
+            switch (transform) {
+                case "grayscale":
+                    image = imageService.getGrayscaleImage(name);
+                    break;
+                case "rotate_clockwise":
+                    image = imageService.getRotatedImage(name);
+                    break;
+                default:
+                    image = imageService.getImage(name);
+            }
         }
+        else {image = imageService.getImage(name);}
         if(image == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND); //404
-        return new ResponseEntity<>(image, HttpStatus.OK); //200
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.IMAGE_PNG).body(image); //200
+
+//        return new ResponseEntity<>(image, HttpStatus.OK); //200
     }
 }
