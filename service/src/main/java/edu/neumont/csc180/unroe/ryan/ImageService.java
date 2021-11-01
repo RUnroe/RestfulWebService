@@ -66,6 +66,15 @@ public class ImageService {
 
     public boolean deleteImage(String name) {
         boolean removed = false;
+        Path path = Paths.get(directory + name);
+
+        try {
+            Files.delete(path);
+            removed = true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            removed = false;
+        }
 
         return removed;
     }

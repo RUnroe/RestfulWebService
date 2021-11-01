@@ -35,7 +35,7 @@ public class FileController {
 
     @DeleteMapping("/image/{name}")
     public ResponseEntity<Image> deleteImage(@PathVariable(value = "name") String name) {
-
+        System.out.println(name);
         if(!imageService.deleteImage(name)) return new ResponseEntity<>(HttpStatus.NOT_FOUND); //404
         return new ResponseEntity<>(HttpStatus.NO_CONTENT); //204
     }
