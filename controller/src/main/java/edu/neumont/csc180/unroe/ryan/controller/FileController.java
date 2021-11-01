@@ -16,16 +16,19 @@ import java.io.IOException;
 public class FileController {
     ImageService imageService = new ImageService();
 
+    //DELETE ME
+    @GetMapping("/ahh")
+    public ResponseEntity<String> ahh() {
+        return new ResponseEntity<>("ahh", HttpStatus.OK);
+    }
+
     @PostMapping("/image")
     public ResponseEntity<Image> createImage(@RequestParam("file") MultipartFile imageFile) {
 
-        //if image is name is found
-        try {
-            if(imageService.createImage(new RestImage(imageFile.getName(), ImageIO.read(imageFile.getInputStream() ))))
-                return new ResponseEntity<>(HttpStatus.CREATED); //201
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+        if(imageService.createImage(imageFile))
+            return new ResponseEntity<>(HttpStatus.CREATED); //201
+
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST); //400
     }
 
