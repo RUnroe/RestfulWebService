@@ -19,5 +19,18 @@ public class ImageService {
         return selectedImage;
     }
 
+    public BufferedImage getGrayscaleImage(String name) {
+        BufferedImage image = getImage(name);
+        //make grayscale
+
+        return image;
+    }
+
+    public BufferedImage getRotatedImage(String name) {
+        BufferedImage image = getImage(name);
+        //rotate image
+
+        return image;
+    }
 
 }
