@@ -1,17 +1,13 @@
 package edu.neumont.csc180.unroe.ryan.controller;
 
 import edu.neumont.csc180.unroe.ryan.ImageService;
-import edu.neumont.csc180.unroe.ryan.RestImage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 
 @RestController
 public class FileController {
@@ -24,13 +20,13 @@ public class FileController {
     }
 
     @PostMapping("/image")
-    public ResponseEntity<Image> createImage(@RequestParam("file") MultipartFile imageFile) {
+    public ResponseEntity<String> createImage(@RequestParam("file") MultipartFile imageFile) {
 
 
         if(imageService.createImage(imageFile))
-            return new ResponseEntity<>(HttpStatus.CREATED); //201
+            return ResponseEntity.status(HttpStatus.CREATED).body(imageFile.getOriginalFilename()); //201
 
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST); //400
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: the name already exists"); //400
     }
 
 

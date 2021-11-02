@@ -45,7 +45,6 @@ public class ImageService {
             outputStream = new ByteArrayOutputStream();
             ImageIO.write(selectedImage, "png", outputStream);
         } catch (IOException e) {
-            e.printStackTrace();
             return null;
         }
 
@@ -113,17 +112,17 @@ public class ImageService {
            try {
                Files.createDirectory(path);
            } catch (IOException e) {
-               e.printStackTrace();
+               return false;
 
            }
        }
        //Create the image
         try(InputStream input = image.getInputStream()){
             Path filePath = path.resolve(imageName);
-            Files.copy(input, filePath, StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(input, filePath);
         } catch (IOException e) {
-            e.printStackTrace();
             //Found image with same name already
+            System.out.println("return false");
             return false;
         }
         return true;
@@ -137,7 +136,6 @@ public class ImageService {
             Files.delete(path);
             removed = true;
         } catch (IOException e) {
-            e.printStackTrace();
             removed = false;
         }
 
