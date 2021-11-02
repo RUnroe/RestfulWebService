@@ -1,5 +1,6 @@
 package edu.neumont.csc180.unroe.ryan;
 
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-
+@Service
 public class ImageService {
     String directory = "image/";
 
