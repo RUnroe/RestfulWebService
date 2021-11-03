@@ -22,9 +22,8 @@ import java.util.Objects;
 
 @Service
 public class ImageService {
-    String directory = "image/";
 
-    public BufferedImage getBufferedImage(String name) {
+    public BufferedImage getBufferedImage(String directory, String name) {
         File image = new File(directory + name);
         if(!image.exists()) return null;
         try {
@@ -34,7 +33,7 @@ public class ImageService {
         }
     }
 
-    public byte[] getImage(String name) {
+    public byte[] getImage(String directory, String name) {
 //        BufferedImage selectedImage = ImageIO.read(directory);
 
         File image = new File(directory + name);
@@ -42,7 +41,7 @@ public class ImageService {
         BufferedImage selectedImage;
         ByteArrayOutputStream outputStream = null;
         try {
-            selectedImage = getBufferedImage(name);
+            selectedImage = getBufferedImage(directory, name);
             outputStream = new ByteArrayOutputStream();
             ImageIO.write(selectedImage, "png", outputStream);
         } catch (IOException e) {
@@ -52,9 +51,9 @@ public class ImageService {
         return outputStream.toByteArray();
     }
 
-    public byte[] getGrayscaleImage(String name) {
+    public byte[] getGrayscaleImage(String directory, String name) {
         //https://www.tutorialspoint.com/java_dip/grayscale_conversion.htm
-        BufferedImage image = getBufferedImage(name);
+        BufferedImage image = getBufferedImage(directory, name);
         if(image == null) return null;
         int width = image.getWidth();
         int height = image.getHeight();
@@ -77,9 +76,9 @@ public class ImageService {
         return outputStream.toByteArray();
     }
 
-    public byte[] getRotatedImage(String name) {
+    public byte[] getRotatedImage(String directory, String name) {
         //https://blog.idrsolutions.com/2019/05/image-rotation-in-java/
-        BufferedImage image = getBufferedImage(name);
+        BufferedImage image = getBufferedImage(directory, name);
         if(image == null) return null;
         //rotate image
         final double rads = Math.toRadians(90);
@@ -104,8 +103,8 @@ public class ImageService {
         return outputStream.toByteArray();
     }
 
-    public boolean createImage(MultipartFile image) {
-       String imageName = image.getOriginalFilename();
+    public boolean createImage(String directory, String imageName, byte[] bytes) {
+//       String imageName = image.getOriginalFilename();
 
        Path path = Paths.get(directory);
        //Create directory if not there
@@ -117,10 +116,12 @@ public class ImageService {
 
            }
        }
+       if(Files.exists(Paths.get(directory + imageName))) return false;
        //Create the image
-        try(InputStream input = image.getInputStream()){
+        try{
             Path filePath = path.resolve(imageName);
-            Files.copy(input, filePath);
+            Files.write(filePath, bytes);
+
         } catch (IOException e) {
             //Found image with same name already
             System.out.println("return false");
@@ -129,7 +130,7 @@ public class ImageService {
         return true;
     }
 
-    public boolean deleteImage(String name) {
+    public boolean deleteImage(String directory, String name) {
         boolean removed = false;
         Path path = Paths.get(directory + name);
 

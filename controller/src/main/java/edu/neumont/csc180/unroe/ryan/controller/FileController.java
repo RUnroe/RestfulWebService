@@ -9,23 +9,22 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.*;
+import java.io.IOException;
 
 @RestController
 public class FileController {
 //    ImageService imageService = new ImageService();
     @Autowired
     ImageService imageService;
-    //DELETE ME
-    @GetMapping("/ahh")
-    public ResponseEntity<String> ahh() {
-        return new ResponseEntity<>("ahh", HttpStatus.OK);
-    }
+
+    String directory = "image/";
+
 
     @PostMapping("/image")
-    public ResponseEntity<String> createImage(@RequestParam("file") MultipartFile imageFile) {
+    public ResponseEntity<String> createImage(@RequestParam("file") MultipartFile imageFile) throws IOException {
 
 
-        if(imageService.createImage(imageFile))
+        if(imageService.createImage(directory, imageFile.getOriginalFilename(), imageFile.getBytes()))
             return ResponseEntity.status(HttpStatus.CREATED).body(imageFile.getOriginalFilename()); //201
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: the name already exists"); //400
@@ -35,7 +34,7 @@ public class FileController {
     @DeleteMapping("/image/{name}")
     public ResponseEntity<Image> deleteImage(@PathVariable(value = "name") String name) {
         System.out.println(name);
-        if(!imageService.deleteImage(name)) return new ResponseEntity<>(HttpStatus.NOT_FOUND); //404
+        if(!imageService.deleteImage(directory, name)) return new ResponseEntity<>(HttpStatus.NOT_FOUND); //404
         return new ResponseEntity<>(HttpStatus.NO_CONTENT); //204
     }
 
@@ -48,16 +47,16 @@ public class FileController {
         if(transform != null) {
             switch (transform) {
                 case "grayscale":
-                    image = imageService.getGrayscaleImage(name);
+                    image = imageService.getGrayscaleImage(directory, name);
                     break;
                 case "rotate_clockwise":
-                    image = imageService.getRotatedImage(name);
+                    image = imageService.getRotatedImage(directory, name);
                     break;
                 default:
-                    image = imageService.getImage(name);
+                    image = imageService.getImage(directory, name);
             }
         }
-        else {image = imageService.getImage(name);}
+        else {image = imageService.getImage(directory, name);}
         if(image == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND); //404
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.IMAGE_PNG).body(image); //200
 
