@@ -50,7 +50,7 @@ class ImageServiceTest {
     }
 
     @Test
-    public void testCreateImage_fileAlreadyExists_fail() throws Exception {
+    public void testCreateImage_fileAlreadyExists_false() throws Exception {
         //Add image to directory
         byte[] bytes = imageService.getImage(dataDirectory, "alreadyExists.png");
         imageService.createImage(directory, "alreadyExists.png", bytes);
@@ -63,5 +63,80 @@ class ImageServiceTest {
     }
 
 
+    @Test
+    public void testGetImage_happyPath() throws Exception {
+        String fileName = "FileTest.png";
+        //Add image to directory
+        byte[] bytes = imageService.getImage(dataDirectory, fileName);
+        imageService.createImage(directory, fileName, bytes);
+
+        assertTrue(imageService.getImage(directory, fileName) != null);
+
+    }
+
+    @Test
+    public void testGetImage_fileNotFound_null() throws Exception {
+        String fileName = "FileTest.png";
+
+        assertTrue(imageService.getImage(directory, fileName) == null);
+
+    }
+
+    @Test
+    public void testDeleteImage_happyPath() throws Exception {
+        String fileName = "FileTest.png";
+        //Add image to directory
+        byte[] bytes = imageService.getImage(dataDirectory, fileName);
+        imageService.createImage(directory, fileName, bytes);
+
+        assertTrue(imageService.deleteImage(directory, fileName));
+
+    }
+
+    @Test
+    public void testDeleteImage_fileNotFound_false() throws Exception {
+        String fileName = "FileTest.png";
+
+        assertFalse(imageService.deleteImage(directory, fileName));
+
+    }
+
+
+
+    @Test
+    public void testGetGreyscaleImage_happyPath() throws Exception {
+        String fileName = "FileTest.png";
+        //Add image to directory
+        byte[] bytes = imageService.getImage(dataDirectory, fileName);
+        imageService.createImage(directory, fileName, bytes);
+
+        assertTrue(imageService.getGrayscaleImage(directory, fileName) != null);
+
+    }
+
+    @Test
+    public void testGetGreyscaleImage_fileNotFound_null() throws Exception {
+        String fileName = "FileTest.png";
+        assertTrue(imageService.getGrayscaleImage(directory, fileName) == null);
+
+    }
+
+    @Test
+    public void testGetRotatedImage_happyPath() throws Exception {
+        String fileName = "FileTest.png";
+        //Add image to directory
+        byte[] bytes = imageService.getImage(dataDirectory, fileName);
+        imageService.createImage(directory, fileName, bytes);
+
+        assertTrue(imageService.getRotatedImage(directory, fileName) != null);
+
+    }
+
+    @Test
+    public void testGetRotatedImage_fileNotFound_null() throws Exception {
+        String fileName = "FileTest.png";
+        assertTrue(imageService.getRotatedImage(directory, fileName) == null);
+
+    }
 
 }
