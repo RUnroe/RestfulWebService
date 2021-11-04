@@ -1,55 +1,64 @@
 package edu.neumont.csc180.unroe.ryan;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+//import org.apache.commons.io.FileUtils;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class ImageServiceTest {
-    @Autowired
-    ImageService imageService;
-    String directory;
-    void setUp() {
-        imageService = new ImageService();
-        directory = "service/src/test/java/edu/neumont/csc180/unroe/ryan/actual/"; // figure it out
-        //create Image so that we can test already exists case
-    }
+
+    ImageService imageService = new ImageService();
+    String dataDirectory = "src/test/java/edu/neumont/csc180/unroe/ryan/data/";
+    String directory = "src/test/java/edu/neumont/csc180/unroe/ryan/actual/";
+
+
 
     @AfterEach
     void tearDown() {
-        //TODO - Delete everything inside of actual
+        File dir = new File(directory);
+        File[] files = dir.listFiles();
+        if(files != null && files.length > 0) {
+            for (File file : files) {
+                file.delete();
+            }
+        }
     }
 
     @Test
     public void testCreateImage_happyPath() throws Exception {
-        String fileName = "FileTest";
-        //make image instead
-        //store test image in data package
-        byte[] fileContent = "filecontent".getBytes(StandardCharsets.UTF_8);
+        String fileName = "FileTest.png";
+        //Add image to directory
+        byte[] bytes = imageService.getImage(dataDirectory, fileName);
+        imageService.createImage(directory, fileName, bytes);
 
-        imageService.createImage(directory, fileName, fileContent);
-
-        FileInputStream fis = new FileInputStream("/images/FileTest.png");
+        FileInputStream fis = new FileInputStream(directory + fileName);
         byte[] expectedResult = fis.readAllBytes();
-        FileInputStream fis2 = new FileInputStream(fileName);
-        byte[] actualResult = fis2.readAllBytes();
-        assertEquals(expectedResult, actualResult);
+        assertTrue(Arrays.equals(expectedResult, bytes));
 
     }
 
     @Test
     public void testCreateImage_fileAlreadyExists_fail() throws Exception {
-        String fileName = "FileTest";
-        byte[] fileContent = "filecontent".getBytes(StandardCharsets.UTF_8);
+        //Add image to directory
+        byte[] bytes = imageService.getImage(dataDirectory, "alreadyExists.png");
+        imageService.createImage(directory, "alreadyExists.png", bytes);
 
-        assertFalse(imageService.createImage(directory, fileName, fileContent));
 
-
+        String fileName = "alreadyExists.png";
+        //Try to add same image to directory
+        assertFalse(imageService.createImage(directory, fileName, bytes));
 
     }
 
